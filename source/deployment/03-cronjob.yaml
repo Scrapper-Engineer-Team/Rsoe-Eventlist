@@ -35,7 +35,7 @@ spec:
                   name: config-rsoe-eventlist
           containers:
           - name: sc-geostrategic-rsoe-eventlist
-            image: 192.168.202.50/crawler/geostrategic/rsoe-eventlist:1.2
+            image: 192.168.202.50/crawler/geostrategic/rsoe-eventlist:1.3
             imagePullPolicy: IfNotPresent
             resources:
               limits:
@@ -44,5 +44,5 @@ spec:
               requests:
                 cpu: "128m"
                 memory: "256Mi"
-            command: ["python", "main.py", "crawler", "--type", "eventlist", "--mode", "get_event", "--headless"]
+            command: ["python", "source/main.py", "crawler", "--type", "eventlist", "--mode", "get_event", "--headless"]
           restartPolicy: Never

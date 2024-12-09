@@ -73,20 +73,34 @@ class RsoeEventlist(RsoeEventlistController):
     async def get_detail_events(self, url_detail):
         try:
             res = requests.get(url_detail).text
-
-
+            
+            # Menetapkan nilai ke variabel terlebih dahulu
+            event_title = HtmlParser().bs4_parser(res, "div.long-section:nth-child(2) > h2:nth-child(1)")
+            source = HtmlParser().bs4_parser(res, ".source-link")
+            severity = HtmlParser().bs4_parser(res, "div.long-section:nth-child(3) > div:nth-child(2) > div:nth-child(2) > p:nth-child(2)")
+            event_date_utc = HtmlParser().bs4_parser(res, "div.long-section:nth-child(4) > div:nth-child(1) > p:nth-child(2)")
+            last_update = HtmlParser().bs4_parser(res, "div.long-section:nth-child(4) > div:nth-child(2) > p:nth-child(2)")
+            latitude = HtmlParser().bs4_parser(res, "#latitude")
+            longitude = HtmlParser().bs4_parser(res, "#longitude")
+            area_range = HtmlParser().bs4_parser(res, "div.long-section:nth-child(6) > div:nth-child(1) > p:nth-child(2)")
+            address_affected_areas = HtmlParser().bs4_parser(res, "div.long-section:nth-child(6) > div:nth-child(2) > div:nth-child(1) > p:nth-child(2)")
+            event_description = HtmlParser().bs4_parser(res, ".event-description > p:nth-child(1)")
+            
+            # Membuat dictionary dengan nilai yang sudah ditetapkan
             data = {
-                "event_title": (event_title := HtmlParser().bs4_parser(res, "div.long-section:nth-child(2) > h2:nth-child(1)"))[0].text.strip() if event_title and len(event_title) > 0 else None,
-                "source": (source := HtmlParser().bs4_parser(res, ".source-link"))[0].text.strip() if source and len(source) > 0 else None,
-                "severity": (severity := HtmlParser().bs4_parser(res, "div.long-section:nth-child(3) > div:nth-child(2) > div:nth-child(2) > p:nth-child(2)"))[0].text.strip() if severity and len(severity) > 0 else None,
-                "event_date_utc": (event_date_utc := HtmlParser().bs4_parser(res, "div.long-section:nth-child(4) > div:nth-child(1) > p:nth-child(2)"))[0].text.strip() if event_date_utc and len(event_date_utc) > 0 else None,
-                "last_update": (last_update := HtmlParser().bs4_parser(res, "div.long-section:nth-child(4) > div:nth-child(2) > p:nth-child(2)"))[0].text.strip() if last_update and len(last_update) > 0 else None,
-                "latitude": (latitude := HtmlParser().bs4_parser(res, "#latitude"))[0].text.strip() if latitude and len(latitude) > 0 else None,
-                "longitude": (longitude := HtmlParser().bs4_parser(res, "#longitude"))[0].text.strip() if longitude and len(longitude) > 0 else None,
-                "area_range": (area_range := HtmlParser().bs4_parser(res, "div.long-section:nth-child(6) > div:nth-child(1) > p:nth-child(2)"))[0].text.strip() if area_range and len(area_range) > 0 else None,
-                "address_affected_areas": (address_affected_areas := HtmlParser().bs4_parser(res, "div.long-section:nth-child(6) > div:nth-child(2) > div:nth-child(1) > p:nth-child(2)"))[0].text.strip() if address_affected_areas and len(address_affected_areas) > 0 else None,
-                "event_description": (event_description := HtmlParser().bs4_parser(res, ".event-description > p:nth-child(1)"))[0].text.strip() if event_description and len(event_description) > 0 else None
+                "event_title": event_title[0].text.strip() if event_title else None,
+                "source": source[0].text.strip() if source else None,
+                "severity": severity[0].text.strip() if severity else None,
+                "event_date_utc": event_date_utc[0].text.strip() if event_date_utc else None,
+                "last_update": last_update[0].text.strip() if last_update else None,
+                "latitude": latitude[0].text.strip() if latitude else None,
+                "longitude": longitude[0].text.strip() if longitude else None,
+                "area_range": area_range[0].text.strip() if area_range else None,
+                "address_affected_areas": address_affected_areas[0].text.strip() if address_affected_areas else None,
+                "event_description": event_description[0].text.strip() if event_description else None
             }
+
+            print(data)
             return data
         except Exception as e:
             self.log.error(e)
