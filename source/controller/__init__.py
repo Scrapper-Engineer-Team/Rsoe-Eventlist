@@ -71,11 +71,6 @@ class Controllers(ABC):
         #     body=_temp,
         #     send=kwargs.get('s3', False)
         # )
-        # self.log.debug(_temp)
-
-
-
-
 
 
     def APIretrys(self, url, headers:dict, cookies:dict, data:dict, link_referer:str, max_retries:int=5, delay:int=2) -> dict:
