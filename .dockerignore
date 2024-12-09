@@ -1,0 +1,13 @@
+.idea/*
+deployment/
+*.pyc
+*.ini
+*.log
+*.log.*
+.fuse_hidden*
+venv/
+venv-dev/
+!test
+test*.*
+data
+.env

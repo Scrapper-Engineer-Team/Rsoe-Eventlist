@@ -1,0 +1,16 @@
+# Python
+.idea/*
+*.pyc
+*.ini
+*.log
+*.log.*
+.fuse_hidden*
+venv/
+venv-dev/
+!test
+*test*.*
+data/
+.env
+config.ini
+data
+data1
