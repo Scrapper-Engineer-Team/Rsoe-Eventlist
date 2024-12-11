@@ -18,8 +18,8 @@ class RsoeEventlist(RsoeEventlistController):
     async def get_event(self, page):
         # ? click ordered by
         try:
-            await page.get_by_label("Order by...").select_option("eventDate")
-            await asyncio.sleep(10)
+            # await page.get_by_label("Order by...").select_option("eventDate")
+            # await asyncio.sleep(10)
 
             html = await page.content()
             category = HtmlParser().bs4_parser(html, "div.right-side > div.list > div")
@@ -42,15 +42,17 @@ class RsoeEventlist(RsoeEventlistController):
                             result = await self.get_detail_events(detail_link)
                             result['location'] = location
 
+                            if result['event_date_utc'] != None:
+                                range_data = result['event_date_utc'].split("-")[0]
+                            else:range_data=None
+
                             cat_clean = category_text.replace(" ","_").replace(",", "_").replace("-", "_").replace("/", "_").replace("\\","_").replace("|","_").replace(".","_").replace("__", "_").replace(":","_").strip().lower()
                             subcat_clean = sub_category_text.replace(" ","_").replace(",", "_").replace("-", "_").replace("/", "_").replace("\\","_").replace("|","_").replace(".","_").replace("__", "_").replace(":","_").strip().lower()
                             filename = title.replace(" ","_").replace(",", "_").replace("-", "_").replace("/", "_").replace("\\","_").replace("|","_").replace(".","_").replace("__", "_").replace(":","_").strip().lower()
 
                             path_data_raw = f"data/{cat_clean}/{subcat_clean}/json/{filename}_{k}.json"
 
-                            if result['event_date_utc']:
-                                range_data = result['event_date_utc'].split("-")[0]
-                            else:range_data=None
+
 
                             self.metadata(
                                 data=result,
@@ -64,7 +66,8 @@ class RsoeEventlist(RsoeEventlistController):
                                 update="daily",
                                 country="Global",
                                 level="Internasional",
-                                range_data=range_data
+                                range_data=range_data,
+                                save=True
                                 )
         except Exception as e:
             error = traceback.print_exc()
@@ -74,7 +77,6 @@ class RsoeEventlist(RsoeEventlistController):
         try:
             res = requests.get(url_detail).text
             
-            # Menetapkan nilai ke variabel terlebih dahulu
             event_title = HtmlParser().bs4_parser(res, "div.long-section:nth-child(2) > h2:nth-child(1)")
             source = HtmlParser().bs4_parser(res, ".source-link")
             severity = HtmlParser().bs4_parser(res, "div.long-section:nth-child(3) > div:nth-child(2) > div:nth-child(2) > p:nth-child(2)")
@@ -86,10 +88,10 @@ class RsoeEventlist(RsoeEventlistController):
             address_affected_areas = HtmlParser().bs4_parser(res, "div.long-section:nth-child(6) > div:nth-child(2) > div:nth-child(1) > p:nth-child(2)")
             event_description = HtmlParser().bs4_parser(res, ".event-description > p:nth-child(1)")
             
-            # Membuat dictionary dengan nilai yang sudah ditetapkan
+
             data = {
                 "event_title": event_title[0].text.strip() if event_title else None,
-                "source": source[0].text.strip() if source else None,
+                "source": source[0]['href'] if source else None,
                 "severity": severity[0].text.strip() if severity else None,
                 "event_date_utc": event_date_utc[0].text.strip() if event_date_utc else None,
                 "last_update": last_update[0].text.strip() if last_update else None,
@@ -99,8 +101,6 @@ class RsoeEventlist(RsoeEventlistController):
                 "address_affected_areas": address_affected_areas[0].text.strip() if address_affected_areas else None,
                 "event_description": event_description[0].text.strip() if event_description else None
             }
-
-            print(data)
             return data
         except Exception as e:
             self.log.error(e)
